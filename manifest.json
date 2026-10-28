@@ -1,0 +1,63 @@
+{
+  "id": "com.namaztracker.app",
+  "name": "Namaz Tracker 2026",
+  "short_name": "Namaz",
+  "description": "Full year Islamic prayer tracker with 13-rank scoring, 5 themes, dashboard and analytics.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#120820",
+  "theme_color": "#120820",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "lifestyle",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Prayer Tracking Home Screen"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard Analytics"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Prayers",
+      "short_name": "Today",
+      "url": ".",
+      "description": "Open today's prayer tracker"
+    }
+  ],
+  "prefer_related_applications": false
+}

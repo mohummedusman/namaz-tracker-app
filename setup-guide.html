@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🕌 نماز ٹریکر — Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a1628;color:#e8f0fe;font-family:'Segoe UI',sans-serif;padding:16px;max-width:480px;margin:0 auto}
+.ur{font-family:'Noto Nastaliq Urdu',serif}
+.header{text-align:center;padding:24px 0 20px}
+.hdr-ico{font-size:48px;margin-bottom:8px}
+.hdr-t{font-size:20px;font-weight:700;color:#7ab8ff;font-family:'Noto Nastaliq Urdu',serif}
+.hdr-s{font-size:11px;color:#5a7fa8;margin-top:4px}
+
+.step-card{background:#0d1e38;border-radius:14px;margin-bottom:14px;overflow:hidden;border:1px solid rgba(74,158,255,.15)}
+.step-hdr{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid rgba(74,158,255,.1)}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sn-done{background:#22c55e;color:#000}
+.sn-act{background:#1a56db;color:#fff}
+.sn-todo{background:#1a2a48;color:#5a7fa8;border:1px solid #1a3a6a}
+.step-title{font-size:13px;font-weight:600;color:#e8f0fe;font-family:'Noto Nastaliq Urdu',serif;flex:1}
+.step-time{font-size:9px;color:#5a7fa8;flex-shrink:0}
+.step-body{padding:14px}
+.inst{font-size:11px;color:#a8c4f0;line-height:1.8;margin-bottom:10px;font-family:'Noto Nastaliq Urdu',serif}
+.inst b{color:#e8f0fe}
+.click-btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:8px;transition:all .2s}
+.btn-blue{background:linear-gradient(135deg,#1a56db,#4a9eff);color:#fff}
+.btn-green{background:linear-gradient(135deg,#16a34a,#22c55e);color:#000}
+.btn-copy{background:#0d2a50;border:1.5px solid #1a56db;color:#7ab8ff;font-family:monospace;font-size:11px;text-align:left;padding:10px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:8px}
+.copy-ico{font-size:14px;margin-right:6px;flex-shrink:0}
+.code-block{background:#060f1e;border:1px solid #1a3a6a;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:9px;color:#7ab8ff;overflow-x:auto;margin-bottom:10px;direction:ltr;white-space:pre-wrap;word-break:break-all}
+.img-placeholder{background:#0d2a50;border:1px dashed #1a3a6a;border-radius:8px;padding:20px;text-align:center;margin-bottom:10px}
+.img-p-t{font-size:10px;color:#5a7fa8}
+.tip{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:8px 12px;font-size:10px;color:#fde68a;margin-bottom:8px;font-family:'Noto Nastaliq Urdu',serif}
+.success-row{display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.url-input{width:100%;background:#060f1e;border:1.5px solid #22c55e;border-radius:8px;padding:10px 12px;font-size:11px;color:#22c55e;font-family:monospace;direction:ltr;outline:none;margin-bottom:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:8px;font-weight:700}
+.b-easy{background:rgba(34,197,94,.15);color:#22c55e}
+.b-once{background:rgba(74,158,255,.15);color:#7ab8ff}
+.done-card{background:rgba(34,197,94,.06);border:2px solid rgba(34,197,94,.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;display:none}
+.done-t{font-size:18px;font-weight:700;color:#22c55e;font-family:'Noto Nastaliq Urdu',serif;margin-bottom:6px}
+.done-s{font-size:10px;color:rgba(255,255,255,.5);line-height:1.7}
+.progress-bar{height:4px;background:#0d1e38;border-radius:2px;margin-bottom:16px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1a56db,#22c55e);border-radius:2px;transition:width .3s}
+.prog-label{font-size:9px;color:#5a7fa8;text-align:center;margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hdr-ico">🕌</div>
+  <div class="hdr-t">نماز ٹریکر Setup</div>
+  <div class="hdr-s">Muhammad Usman — ایک بار کریں، ہمیشہ کے لیے</div>
+</div>
+
+<!-- Progress -->
+<div class="prog-label" id="progLabel">0 of 3 complete</div>
+<div class="progress-bar"><div class="progress-fill" id="progBar" style="width:0%"></div></div>
+
+<!-- ══ STEP 1: Create Google Sheet ══ -->
+<div class="step-card" id="card1">
+  <div class="step-hdr" onclick="toggle(1)">
+    <div class="step-num sn-act" id="num1">1</div>
+    <div class="step-title">Google Sheet بنائیں</div>
+    <div class="step-time">⏱ 3 منٹ</div>
+  </div>
+  <div class="step-body" id="body1">
+    <div class="tip">💡 آپ کو صرف نیچے کے buttons tap کرنے ہیں — کوئی typing نہیں!</div>
+
+    <div class="inst"><b>Step 1:</b> نیچے بٹن دبائیں — Google Sheets کھلے گی</div>
+    <a class="click-btn btn-blue ur" href="https://sheets.new" target="_blank" onclick="markVisit(1)">
+      📊 Google Sheet کھولیں (نئی)
+    </a>
+
+    <div class="inst"><b>Step 2:</b> Sheet کا نام رکھیں: <b>"BJNT Namaz Tracker"</b></div>
+    <div class="img-placeholder">
+      <div style="font-size:24px;margin-bottom:6px">✏️</div>
+      <div class="img-p-t">Sheet کے اوپر "Untitled spreadsheet" پر click کریں → نام لکھیں</div>
+    </div>
+
+    <div class="inst"><b>Step 3:</b> Done — اب Step 2 پر جائیں ↓</div>
+    <button class="click-btn btn-green ur" onclick="completeStep(1)">✅ Sheet بنا لی — آگے جائیں</button>
+  </div>
+</div>
+
+<!-- ══ STEP 2: Apps Script ══ -->
+<div class="step-card" id="card2">
+  <div class="step-hdr" onclick="toggle(2)">
+    <div class="step-num sn-todo" id="num2">2</div>
+    <div class="step-title">Code لگائیں (Copy-Paste)</div>
+    <div class="step-time">⏱ 5 منٹ</div>
+  </div>
+  <div class="step-body" id="body2" style="display:none">
+    <div class="tip">💡 یہ code آپ کی Sheet کو smart بناتا ہے — صرف copy-paste!</div>
+
+    <div class="inst"><b>Step 1:</b> آپ کی Google Sheet میں اوپر menu میں<br>
+    <b>Extensions → Apps Script</b> کلک کریں</div>
+    <div class="img-placeholder">
+      <div style="font-size:20px;margin-bottom:4px">📋 Extensions → Apps Script</div>
+      <div class="img-p-t">نئی tab میں Apps Script Editor کھلے گی</div>
+    </div>
+
+    <div class="inst"><b>Step 2:</b> وہاں جو code ہے وہ سب delete کریں، پھر یہ copy کریں:</div>
+    <button class="btn-copy" onclick="copyCode()">
+      <span><span class="copy-ico">📋</span> Code Copy کریں (ایک click)</span>
+      <span id="copyStatus" style="color:#22c55e;font-size:10px;font-family:'Segoe UI'"></span>
+    </button>
+
+    <div class="inst"><b>Step 3:</b> Apps Script Editor میں Paste کریں (Ctrl+V یا ⌘+V)</div>
+
+    <div class="inst"><b>Step 4:</b> Save کریں (💾 یا Ctrl+S)</div>
+
+    <div class="inst"><b>Step 5:</b> <b>"Deploy"</b> button → <b>"New Deployment"</b></div>
+    <div class="img-placeholder">
+      <div style="font-size:20px;margin-bottom:4px">🚀 Deploy → New Deployment</div>
+      <div class="img-p-t">Type: "Web App" چنیں<br>Execute as: "Me"<br>Who has access: "Anyone"</div>
+    </div>
+
+    <div class="inst"><b>Step 6:</b> <b>"Deploy"</b> → URL copy کریں</div>
+    <div class="success-row">
+      <span style="font-size:18px">🔗</span>
+      <div>
+        <div style="font-size:10px;color:#22c55e;font-weight:600">URL کچھ ایسی ہوگی:</div>
+        <div style="font-size:9px;color:#5a7fa8;direction:ltr">https://script.google.com/macros/s/ABC.../exec</div>
+      </div>
+    </div>
+
+    <div class="inst"><b>Step 7:</b> وہ URL یہاں paste کریں:</div>
+    <input type="url" class="url-input" id="apiUrlInput"
+      placeholder="https://script.google.com/macros/s/..."
+      oninput="checkUrl()">
+
+    <button class="click-btn btn-green ur" id="step2Btn" onclick="completeStep(2)" disabled
+      style="opacity:.4">
+      ✅ URL paste کر لی — آگے جائیں
+    </button>
+  </div>
+</div>
+
+<!-- ══ STEP 3: Done! ══ -->
+<div class="step-card" id="card3">
+  <div class="step-hdr" onclick="toggle(3)">
+    <div class="step-num sn-todo" id="num3">3</div>
+    <div class="step-title">App سے Connect ہو جائیں</div>
+    <div class="step-time">⏱ 1 منٹ</div>
+  </div>
+  <div class="step-body" id="body3" style="display:none">
+    <div class="tip">💡 آپ کی Sheet URL آپ کے APK میں automatically جائے گی!</div>
+
+    <div class="inst"><b>آپ کی Apps Script URL:</b></div>
+    <div class="code-block" id="finalUrl" style="color:#22c55e">— URL ابھی نہیں ہے —</div>
+
+    <div class="inst"><b>Step 1:</b> یہ URL copy کریں</div>
+    <button class="click-btn btn-blue ur" onclick="copyFinalUrl()">📋 URL Copy کریں</button>
+
+    <div class="inst"><b>Step 2:</b> Muhammad Usman کو یہ URL WhatsApp پر بھیجیں</div>
+    <button class="click-btn btn-green ur" onclick="sendWhatsApp()">
+      📲 WhatsApp پر بھیجیں
+    </button>
+
+    <div class="tip">
+      💬 Muhammad Usman آپ کے لیے APK بنائیں گے جس میں یہ URL already set ہوگی —
+      آپ کو کچھ اور نہیں کرنا!
+    </div>
+
+    <button class="click-btn btn-green ur" onclick="completeStep(3)">✅ ہو گیا!</button>
+  </div>
+</div>
+
+<!-- ══ DONE! ══ -->
+<div class="done-card" id="doneCard">
+  <div style="font-size:40px;margin-bottom:8px">🎉</div>
+  <div class="done-t">مبارک ہو! Setup مکمل ہوئی</div>
+  <div class="done-s">
+    اب Muhammad Usman آپ کا APK تیار کریں گے<br>
+    آپ کو صرف APK install کرنی ہے<br>
+    اور Activation Code enter کرنی ہے<br><br>
+    <strong style="color:#22c55e">آپ کا daily کام صرف:<br>
+    BJNT image → Sheet → سب update ✅</strong>
+  </div>
+</div>
+
+<script>
+// ── THE COMPLETE APPS SCRIPT CODE ──────────────────────
+const APPS_SCRIPT_CODE = `/**
+ * BJNT Namaz Tracker — Google Apps Script API
+ * Version 2.0 — Two-Way Sync
+ * Paste this in Extensions → Apps Script
+ */
+
+const CFG = {
+  CODES: ['bjnt2026','namaz786'],
+  TZ: 'Asia/Karachi',
+};
+const SH = {
+  MASJIDS:'MasjidList', TIMINGS:'DailyTimings',
+  CITY:'CityPrayerTimes', LOG:'PrayerLog', USERS:'Users'
+};
+
+function doGet(e) {
+  setup();
+  const p=e.parameter||{}, act=p.action||'today', date=p.date||today(), uid=p.uid||'x';
+  let r;
+  if(act==='today')    r=getToday(date,uid);
+  else if(act==='validate') r={ok:true,valid:CFG.CODES.includes(p.code),v:'2.0'};
+  else if(act==='ping')     r={ok:true,time:new Date().toISOString()};
+  else r={error:'unknown'};
+  return out(r);
+}
+
+function doPost(e) {
+  setup();
+  const b=JSON.parse(e.postData.contents||'{}'),act=b.action||'',uid=b.uid||'x';
+  let r;
+  if(act==='save_prayer')   r=savePrayer(b,uid);
+  else if(act==='save_day') r=saveDay(b,uid);
+  else if(act==='register') r=register(b);
+  else r={error:'unknown'};
+  return out(r);
+}
+
+function getToday(date,uid) {
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  const city=getCityTimes(ss,date);
+  const masjids=getMasjids(ss,date);
+  const log=getLog(ss,uid,date);
+  return {ok:true,date,city,masjids,log,count:masjids.length,updatedAt:new Date().toISOString()};
+}
+
+function getCityTimes(ss,date) {
+  const sh=ss.getSheetByName(SH.CITY); if(!sh) return {};
+  const rows=sh.getDataRange().getValues(), hdrs=rows[0].map(h=>h.toString().toLowerCase());
+  for(let i=1;i<rows.length;i++){
+    if(fmt(rows[i][0])===date){const o={};hdrs.forEach((h,j)=>o[h]=rows[i][j].toString());return o;}
+  }
+  return {subhsadiq:'05:19',sunrise:'06:36',zawal:'12:16',zuhr:'12:21',asr:'16:19',sunset:'17:56',isha:'19:13'};
+}
+
+function getMasjids(ss,date) {
+  const ms=ss.getSheetByName(SH.MASJIDS),ts=ss.getSheetByName(SH.TIMINGS);
+  if(!ms) return [];
+  const mr=ms.getDataRange().getValues(),mh=mr[0].map(h=>h.toString().toLowerCase());
+  const M={};
+  for(let i=1;i<mr.length;i++){if(!mr[i][0])continue;const id=mr[i][0].toString();const o={};mh.forEach((h,j)=>o[h]=mr[i][j].toString());M[id]=o;}
+  const T={};
+  if(ts){const tr=ts.getDataRange().getValues(),th=tr[0].map(h=>h.toString().toLowerCase());
+    for(let i=1;i<tr.length;i++){if(!tr[i][0])continue;if(fmt(tr[i][0])!==date)continue;const id=tr[i][1].toString();const o={};th.forEach((h,j)=>o[h]=tr[i][j].toString());T[id]=o;}}
+  return Object.keys(M).map(id=>{const m=M[id],t=T[id]||{};return{
+    id,name:m.name||'',area:m.area||'',lat:parseFloat(m.lat)||0,lng:parseFloat(m.lng)||0,
+    fajr:t.fajr||m.fajr_default||'06:05',zuhr:t.zuhr||m.zuhr_default||'13:15',
+    asr:t.asr||m.asr_default||'16:45',maghrib:t.maghrib||m.maghrib_default||'18:00',
+    isha:t.isha||m.isha_default||'19:30',live:!!T[id]};}).filter(m=>m.lat);
+}
+
+function getLog(ss,uid,date) {
+  const sh=ss.getSheetByName(SH.LOG); if(!sh) return {};
+  const rows=sh.getDataRange().getValues(),hdrs=rows[0].map(h=>h.toString().toLowerCase());
+  const log={};
+  for(let i=1;i<rows.length;i++){
+    if(fmt(rows[i][0])===date&&rows[i][1].toString()===uid){
+      const p=rows[i][2].toString().toLowerCase();
+      log[p]={rank:parseInt(rows[i][3])||0,miswak:rows[i][4].toString()==='true',score:parseFloat(rows[i][5])||0};
+    }
+  }
+  return log;
+}
+
+function savePrayer(b,uid) {
+  const sh=getOrCreate(SH.LOG,['Date','UserID','Prayer','Rank','Miswak','Score','SavedAt','Notes']);
+  const rows=sh.getDataRange().getValues();
+  const d=b.date||today(),p=(b.prayer||'').toLowerCase(),r=b.rank||0,m=b.miswak?'true':'false',sc=b.score||0;
+  let found=false;
+  for(let i=1;i<rows.length;i++){
+    if(fmt(rows[i][0])===d&&rows[i][1].toString()===uid&&rows[i][2].toString().toLowerCase()===p){
+      sh.getRange(i+1,1,1,8).setValues([[d,uid,p,r,m,sc,new Date().toISOString(),b.notes||'']]);
+      found=true;break;
+    }
+  }
+  if(!found) sh.appendRow([d,uid,p,r,m,sc,new Date().toISOString(),b.notes||'']);
+  return {ok:true,saved:true,prayer:p,rank:r,score:sc};
+}
+
+function saveDay(b,uid) {
+  const prayers=b.prayers||{},date=b.date||today();
+  Object.entries(prayers).forEach(([p,data])=>savePrayer({...data,date,prayer:p},uid));
+  return {ok:true,date,count:Object.keys(prayers).length};
+}
+
+function register(b) {
+  if(!CFG.CODES.includes(b.code)) return {ok:false,error:'Invalid code'};
+  const sh=getOrCreate(SH.USERS,['UserID','Name','Code','RegisteredAt','LastSeen']);
+  const rows=sh.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){if(rows[i][0].toString()===b.uid){sh.getRange(i+1,5).setValue(new Date().toISOString());return{ok:true,uid:b.uid,existing:true};}}
+  sh.appendRow([b.uid,b.name||'User',b.code,new Date().toISOString(),new Date().toISOString()]);
+  return {ok:true,uid:b.uid,registered:true};
+}
+
+function setup() {
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  const needed=[[SH.MASJIDS,['ID','Name','Area','Lat','Lng','Fajr_Default','Zuhr_Default','Asr_Default','Maghrib_Default','Isha_Default']],
+    [SH.TIMINGS,['Date','MasjidID','Fajr','Zuhr','Asr','Maghrib','Isha']],
+    [SH.CITY,['Date','SubhSadiq','Sunrise','Zawal','Zuhr','Asr','Sunset','Isha']],
+    [SH.LOG,['Date','UserID','Prayer','Rank','Miswak','Score','SavedAt','Notes']],
+    [SH.USERS,['UserID','Name','Code','RegisteredAt','LastSeen']]];
+  needed.forEach(([n,h])=>{if(!ss.getSheetByName(n)){const s=ss.insertSheet(n);s.getRange(1,1,1,h.length).setValues([h]).setBackground('#1a56db').setFontColor('#fff').setFontWeight('bold');s.setFrozenRows(1);}});
+}
+
+function getOrCreate(name,hdrs){const ss=SpreadsheetApp.getActiveSpreadsheet();let sh=ss.getSheetByName(name);if(!sh){sh=ss.insertSheet(name);sh.getRange(1,1,1,hdrs.length).setValues([hdrs]).setBackground('#1a56db').setFontColor('#fff').setFontWeight('bold');sh.setFrozenRows(1);}return sh;}
+function fmt(v){if(!v)return'';if(v instanceof Date)return Utilities.formatDate(v,CFG.TZ,'yyyy-MM-dd');const s=v.toString().trim();if(s.match(/^\\d{2}[\\/\\-]\\d{2}[\\/\\-]\\d{4}$/)){const p=s.split(/[\\/\\-]/);return p[2]+'-'+p[1]+'-'+p[0];}return s;}
+function today(){return Utilities.formatDate(new Date(),CFG.TZ,'yyyy-MM-dd');}
+function out(data){const o=ContentService.createTextOutput(JSON.stringify(data));o.setMimeType(ContentService.MimeType.JSON);return o;}
+
+function onOpen(){SpreadsheetApp.getUi().createMenu('🕌 Namaz Tracker').addItem('✅ Setup Karein','setup').addItem('🔗 API URL Dekhin','showUrl').addToUi();}
+function showUrl(){const url=ScriptApp.getService().getUrl();SpreadsheetApp.getUi().alert('API URL:\\n\\n'+url+'\\n\\nYeh URL copy karein → Muhammad Usman ko bhejen');}
+`;
+
+// ── STATE ──
+let steps = {1:false, 2:false, 3:false};
+let apiUrl = '';
+
+function toggle(n) {
+  const b = document.getElementById('body'+n);
+  if(b) b.style.display = b.style.display==='none'?'block':'none';
+}
+
+function markVisit(n) {}
+
+function copyCode() {
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+    document.getElementById('copyStatus').textContent = '✓ Copy ہو گیا!';
+    setTimeout(() => document.getElementById('copyStatus').textContent='', 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = APPS_SCRIPT_CODE;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('copyStatus').textContent = '✓ Copy ہو گیا!';
+    setTimeout(() => document.getElementById('copyStatus').textContent='', 2000);
+  });
+}
+
+function checkUrl() {
+  const val = document.getElementById('apiUrlInput').value.trim();
+  const btn = document.getElementById('step2Btn');
+  const valid = val.includes('script.google.com') && val.includes('/exec');
+  btn.disabled = !valid;
+  btn.style.opacity = valid ? '1' : '0.4';
+  if(valid) {
+    apiUrl = val;
+    document.getElementById('finalUrl').textContent = val;
+  }
+}
+
+function completeStep(n) {
+  steps[n] = true;
+  document.getElementById('num'+n).className = 'step-num sn-done';
+  document.getElementById('num'+n).textContent = '✓';
+  document.getElementById('body'+n).style.display = 'none';
+  // Activate next
+  if(n < 3) {
+    document.getElementById('num'+(n+1)).className = 'step-num sn-act';
+    document.getElementById('body'+(n+1)).style.display = 'block';
+  }
+  updateProgress();
+  if(n===3) {
+    document.getElementById('doneCard').style.display = 'block';
+    window.scrollTo({top:9999,behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const done = Object.values(steps).filter(Boolean).length;
+  document.getElementById('progBar').style.width = (done/3*100)+'%';
+  document.getElementById('progLabel').textContent = done + ' of 3 complete';
+}
+
+function copyFinalUrl() {
+  if(!apiUrl) { alert('پہلے URL paste کریں'); return; }
+  navigator.clipboard.writeText(apiUrl).catch(()=>{});
+  alert('✅ URL copy ہو گئی! WhatsApp پر بھیجیں۔');
+}
+
+function sendWhatsApp() {
+  if(!apiUrl) { alert('پہلے URL paste کریں'); return; }
+  const msg = encodeURIComponent(
+    '🕌 میری Apps Script URL:\n\n' + apiUrl +
+    '\n\nNamaz Tracker APK کے لیے — Muhammad Usman'
+  );
+  window.open('https://wa.me/?text='+msg, '_blank');
+}
+</script>
+</body>
+</html>
