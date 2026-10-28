@@ -19,28 +19,156 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Install Gradle 8.4
+    - name: Create Android Project
       run: |
-        wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip -O /tmp/gradle.zip
-        unzip -q /tmp/gradle.zip -d /opt/
-        echo "/opt/gradle-8.4/bin" >> $GITHUB_PATH
+        mkdir -p app/src/main/java/com/bjnt/namaztracker
+        mkdir -p app/src/main/res/layout
+        mkdir -p app/src/main/res/values
+        mkdir -p app/src/main/res/drawable
+        mkdir -p gradle/wrapper
 
-    - name: Generate Keystore
-      run: |
-        mkdir -p app
-        keytool -genkey -v \
-          -keystore app/keystore.jks \
-          -alias namazkey \
-          -keyalg RSA -keysize 2048 -validity 10000 \
-          -storepass bjnt2026ks -keypass bjnt2026ks \
-          -dname "CN=BJNT,O=Karachi,C=PK" \
-          -storetype JKS
+        cat > settings.gradle << 'EOF'
+        rootProject.name = "NamazTracker"
+        include ':app'
+        EOF
+
+        cat > build.gradle << 'EOF'
+        buildscript {
+            repositories { google(); mavenCentral() }
+            dependencies { classpath 'com.android.tools.build:gradle:8.1.4' }
+        }
+        allprojects {
+            repositories { google(); mavenCentral() }
+        }
+        EOF
+
+        cat > gradle.properties << 'EOF'
+        android.useAndroidX=true
+        android.enableJetifier=true
+        org.gradle.jvmargs=-Xmx2048m
+        EOF
+
+        cat > app/build.gradle << 'EOF'
+        plugins { id 'com.android.application' }
+        android {
+            namespace 'com.bjnt.namaztracker'
+            compileSdk 34
+            defaultConfig {
+                applicationId "com.bjnt.namaztracker"
+                minSdk 21
+                targetSdk 34
+                versionCode 1
+                versionName "1.0"
+            }
+            buildTypes {
+                debug { minifyEnabled false }
+            }
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+        dependencies {
+            implementation 'androidx.appcompat:appcompat:1.6.1'
+        }
+        EOF
+
+        cat > app/src/main/AndroidManifest.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+            <application
+                android:label="نماز ٹریکر"
+                android:theme="@style/AppTheme"
+                android:usesCleartextTraffic="false">
+                <activity
+                    android:name=".MainActivity"
+                    android:exported="true"
+                    android:screenOrientation="portrait">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN"/>
+                        <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
+
+        cat > app/src/main/java/com/bjnt/namaztracker/MainActivity.java << 'EOF'
+        package com.bjnt.namaztracker;
+        import android.annotation.SuppressLint;
+        import android.os.Bundle;
+        import android.webkit.*;
+        import androidx.appcompat.app.AppCompatActivity;
+        public class MainActivity extends AppCompatActivity {
+            private static final String URL = "https://mellifluous-squirrel-1b9ab4.netlify.app/";
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                WebView web = new WebView(this);
+                setContentView(web);
+                @SuppressLint("SetJavaScriptEnabled")
+                WebSettings s = web.getSettings();
+                s.setJavaScriptEnabled(true);
+                s.setDomStorageEnabled(true);
+                s.setGeolocationEnabled(true);
+                s.setGeolocationDatabasePath(getFilesDir().getPath());
+                web.setWebChromeClient(new WebChromeClient() {
+                    @Override
+                    public void onGeolocationPermissionsShowPrompt(String o, GeolocationPermissions.Callback c) {
+                        c.invoke(o, true, false);
+                    }
+                });
+                web.loadUrl(URL);
+            }
+        }
+        EOF
+
+        cat > app/src/main/res/layout/activity_main.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <WebView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        EOF
+
+        cat > app/src/main/res/values/styles.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+            <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+                <item name="android:windowBackground">#0A1628</item>
+                <item name="android:statusBarColor">#0A1628</item>
+            </style>
+        </resources>
+        EOF
+
+        cat > app/src/main/res/values/strings.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+            <string name="app_name">نماز ٹریکر</string>
+        </resources>
+        EOF
+
+        # Gradle wrapper
+        cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        EOF
+
+        curl -sL https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar \
+          -o gradle/wrapper/gradle-wrapper.jar
+
+        curl -sL https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew \
+          -o gradlew && chmod +x gradlew
 
     - name: Build Debug APK
-      run: gradle assembleDebug --no-daemon --stacktrace
+      run: ./gradlew assembleDebug --no-daemon
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
-        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
