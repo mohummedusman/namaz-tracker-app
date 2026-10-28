@@ -1,0 +1,51 @@
+name: 🕌 Build Namaz Tracker APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - uses: android-actions/setup-android@v3
+    - uses: gradle/actions/setup-gradle@v3
+
+    - name: Generate Keystore
+      run: |
+        keytool -genkeypair -v \
+          -keystore app/keystore.jks -alias namazkey \
+          -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass bjnt2026ks -keypass bjnt2026key \
+          -dname "CN=NamazTracker,OU=BJNT,O=Karachi,L=Karachi,ST=Sindh,C=PK"
+
+    - name: Build APK
+      run: chmod +x gradlew && ./gradlew assembleRelease
+      env:
+        KS_PASS: bjnt2026ks
+        KEY_PASS: bjnt2026key
+
+    - name: Rename APK
+      run: mv app/build/outputs/apk/release/app-release.apk NamazTracker-v${{ github.run_number }}.apk
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NamazTracker-APK-v${{ github.run_number }}
+        path: NamazTracker-v*.apk
+        retention-days: 90
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v2.0.${{ github.run_number }}
+        name: "نماز ٹریکر v2.0.${{ github.run_number }}"
+        files: NamazTracker-v*.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
