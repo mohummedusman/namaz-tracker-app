@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.bjnt.namaztracker'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.bjnt.namaztracker"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "2.0"
+    }
+    signingConfigs {
+        release {
+            storeFile file("keystore.jks")
+            storePassword System.getenv("KS_PASS") ?: "bjnt2026ks"
+            keyAlias "namazkey"
+            keyPassword System.getenv("KEY_PASS") ?: "bjnt2026key"
+        }
+    }
+    buildTypes {
+        release { minifyEnabled false; signingConfig signingConfigs.release }
+        debug   { applicationIdSuffix ".debug" }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+}
