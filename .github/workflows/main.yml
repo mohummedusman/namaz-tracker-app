@@ -94,6 +94,13 @@ jobs:
         curl -sL "https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar" \
           -o gradle/wrapper/gradle-wrapper.jar
 
+    - name: Fix Java Code
+      run: |
+        sed -i 's/cfg.optString("activation_codes".*replace.*replace.*replace.*/cfg.optString("valid_codes", "bjnt2026,namaz786");/g' \
+          app/src/main/java/com/bjnt/namaztracker/MainActivity.java
+        sed -i 's/cfg.optString("activation_codes".*replace.*replace.*replace.*/cfg.optString("valid_codes", "bjnt2026,namaz786");/g' \
+          app/src/main/java/com/bjnt/namaztracker/SetupActivity.java
+    
     - name: Build Debug APK
       run: |
         chmod +x gradlew
