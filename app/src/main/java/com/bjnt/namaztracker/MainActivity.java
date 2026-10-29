@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
 
     // ── Your Netlify URL — this is the ONLY thing to update ──────
-    private static final String NETLIFY_URL = "https://mellifluous-squirrel-1b9ab4.netlify.app";
+    private static final String NETLIFY_URL = "https://namaz-ontime.netlify.app/";
     private static final String APP_URL     = NETLIFY_URL + "/";
     private static final String CONFIG_URL  = NETLIFY_URL + "/api-config.json";
     // ─────────────────────────────────────────────────────────────
