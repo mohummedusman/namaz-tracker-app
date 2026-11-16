@@ -44,12 +44,19 @@ jobs:
                 <activity
                     android:name=".MainActivity"
                     android:exported="true"
+                    android:launchMode="singleTask"
                     android:screenOrientation="portrait"
                     android:configChanges="orientation|screenSize|keyboardHidden"
                     android:windowSoftInputMode="adjustResize">
                     <intent-filter>
                         <action android:name="android.intent.action.MAIN"/>
                         <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+                    <intent-filter>
+                        <action android:name="android.intent.action.VIEW"/>
+                        <category android:name="android.intent.category.DEFAULT"/>
+                        <category android:name="android.intent.category.BROWSABLE"/>
+                        <data android:scheme="namaztracker" android:host="login"/>
                     </intent-filter>
                 </activity>
                 <activity
@@ -101,6 +108,74 @@ jobs:
         sed -i 's/cfg.optString("activation_codes".*replace.*replace.*replace.*/cfg.optString("valid_codes", "bjnt2026,namaz786");/g' \
           app/src/main/java/com/bjnt/namaztracker/SetupActivity.java
     
+    - name: Google login + no activation screen
+      run: |
+        cat > /tmp/patch_nt.py << 'PY'
+        import sys
+        base = "app/src/main/java/com/bjnt/namaztracker/"
+        def patch(fname, pairs):
+            p = base + fname
+            s = open(p, encoding="utf-8").read()
+            for old, new in pairs:
+                if s.count(old) != 1:
+                    sys.exit("PATCH FAILED in " + fname + ": anchor found " + str(s.count(old)) + " times: " + old)
+                s = s.replace(old, new)
+            open(p, "w", encoding="utf-8").write(s)
+        patch("MainActivity.java", [
+            ("    private SharedPreferences prefs;",
+             "    private SharedPreferences prefs;\n    private String pendingToken = null;"),
+            ('prefs = getSharedPreferences("nt2_prefs", MODE_PRIVATE);',
+             'prefs = getSharedPreferences("nt2_prefs", MODE_PRIVATE);\n        captureToken(getIntent());'),
+            ("    private void fetchConfigThenSetup() {",
+             """    private void captureToken(Intent i) {
+            try {
+                if (i != null && i.getData() != null && "namaztracker".equals(i.getData().getScheme())) {
+                    String t = i.getData().getQueryParameter("t");
+                    if (t != null && !t.isEmpty()) pendingToken = t;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        private void deliverToken() {
+            if (pendingToken == null || webView == null) return;
+            String t = pendingToken;
+            pendingToken = null;
+            webView.evaluateJavascript("if(window.rlGoogleToken){window.rlGoogleToken(" + JSONObject.quote(t) + ");}", null);
+        }
+
+        @Override protected void onNewIntent(Intent intent) {
+            super.onNewIntent(intent);
+            setIntent(intent);
+            captureToken(intent);
+            deliverToken();
+        }
+
+        private void fetchConfigThenSetup() {"""),
+            ("s.setCacheMode(WebSettings.LOAD_DEFAULT);",
+             's.setCacheMode(WebSettings.LOAD_DEFAULT);\n        s.setUserAgentString(s.getUserAgentString() + " NamazAPK/2");'),
+            ("injectUserData();",
+             "injectUserData();\n                deliverToken();"),
+            ("String url = req.getUrl().toString();",
+             'String url = req.getUrl().toString();\n                if(url.contains("/login.html")) {\n                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));\n                    return true;\n                }'),
+        ])
+        patch("SetupActivity.java", [
+            ('prefs = getSharedPreferences("nt2_prefs", MODE_PRIVATE);',
+             """prefs = getSharedPreferences("nt2_prefs", MODE_PRIVATE);
+            if (!prefs.getBoolean("setup_done", false)) {
+                prefs.edit()
+                    .putString("user_id", "u_" + java.util.UUID.randomUUID().toString().substring(0, 8))
+                    .putString("user_name", "User")
+                    .putBoolean("setup_done", true)
+                    .apply();
+            }
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            if (true) return;"""),
+        ])
+        print("Patched OK")
+        PY
+        python3 /tmp/patch_nt.py
+
     - name: Build Debug APK
       run: |
         chmod +x gradlew
