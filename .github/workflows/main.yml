@@ -153,6 +153,62 @@ jobs:
         private void fetchConfigThenSetup() {"""),
             ("s.setCacheMode(WebSettings.LOAD_DEFAULT);",
              's.setCacheMode(WebSettings.LOAD_DEFAULT);\n        s.setUserAgentString(s.getUserAgentString() + " NamazAPK/2");'),
+            ("    private String pendingToken = null;",
+             "    private String pendingToken = null;\n    private android.webkit.ValueCallback<Uri[]> fileCb;\n    private String pendingSave = null;"),
+            ("@Override public void onGeolocationPermissionsShowPrompt(",
+             """@Override public boolean onShowFileChooser(WebView w, android.webkit.ValueCallback<Uri[]> cb, FileChooserParams fp) {
+                    if (fileCb != null) fileCb.onReceiveValue(null);
+                    fileCb = cb;
+                    try {
+                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                        i.setType("*/*");
+                        startActivityForResult(Intent.createChooser(i, "Backup file chunen"), 7701);
+                    } catch (Exception e) { fileCb = null; return false; }
+                    return true;
+                }
+                @Override public void onGeolocationPermissionsShowPrompt("""),
+            ("@JavascriptInterface public void refreshFromSheet()",
+             """@JavascriptInterface public void saveBackup(String name, String text) {
+                pendingSave = text;
+                runOnUiThread(() -> {
+                    Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("application/json");
+                    i.putExtra(Intent.EXTRA_TITLE, name);
+                    startActivityForResult(i, 7702);
+                });
+            }
+            @JavascriptInterface public void refreshFromSheet()"""),
+            ("@Override public void onBackPressed()",
+             """@Override protected void onActivityResult(int rq, int rs, Intent d) {
+            if (rq == 7701) {
+                if (fileCb != null) {
+                    Uri[] r = null;
+                    if (rs == RESULT_OK && d != null && d.getData() != null) r = new Uri[]{ d.getData() };
+                    fileCb.onReceiveValue(r);
+                    fileCb = null;
+                }
+                return;
+            }
+            if (rq == 7702) {
+                if (rs == RESULT_OK && d != null && d.getData() != null && pendingSave != null) {
+                    try {
+                        java.io.OutputStream os = getContentResolver().openOutputStream(d.getData());
+                        os.write(pendingSave.getBytes("UTF-8"));
+                        os.close();
+                        android.widget.Toast.makeText(this, "Backup save ho gaya", android.widget.Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        android.widget.Toast.makeText(this, "Save nahi hua", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+                pendingSave = null;
+                return;
+            }
+            super.onActivityResult(rq, rs, d);
+        }
+
+        @Override public void onBackPressed()"""),
             ("injectUserData();",
              "injectUserData();\n                deliverToken();"),
             ("String url = req.getUrl().toString();",
