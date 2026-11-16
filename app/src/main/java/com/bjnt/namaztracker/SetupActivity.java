@@ -28,17 +28,7 @@ public class SetupActivity extends AppCompatActivity {
 
         prefs = getSharedPreferences("nt2_prefs", MODE_PRIVATE);
 
-        // Activation code screen hata di gayi: pehli dafa khud setup ho jata hai
-        if (!prefs.getBoolean("setup_done", false)) {
-            prefs.edit()
-                .putString("user_id",   "u_" + UUID.randomUUID().toString().substring(0, 8))
-                .putString("user_name", "User")
-                .putString("api_url",   API_URL)
-                .putBoolean("setup_done", true)
-                .apply();
-        }
-
-        // Seedha main app
+        // Already set up? Go straight to main app
         if (prefs.getBoolean("setup_done", false)) {
             goToMain();
             return;
