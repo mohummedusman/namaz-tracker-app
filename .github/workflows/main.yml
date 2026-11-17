@@ -19,13 +19,30 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Fix Icon Files
+    - name: Fix Icon Files + app name
       run: |
-        rm -f app/src/main/res/mipmap-hdpi/ic_launcher.xml
-        rm -f app/src/main/res/mipmap-hdpi/ic_launcher_round.xml
-        rm -f app/src/main/res/mipmap-xhdpi/ic_launcher.xml
-        rm -f app/src/main/res/mipmap-xxhdpi/ic_launcher.xml
-        echo "Icons removed"
+        rm -rf app/src/main/res/mipmap-anydpi* app/src/main/res/drawable-anydpi* 2>/dev/null || true
+        find app/src/main/res -path '*mipmap*' -name 'ic_launcher*' -delete
+        curl -fsSL -o /tmp/icon512.png "https://namaz-ontime.netlify.app/icon-512.png?v=$(date +%s)" || { echo "ICON DOWNLOAD FAILED: pehle Netlify par zip deploy karein"; exit 1; }
+        pip install pillow
+        python3 - << 'PY'
+        from PIL import Image, ImageDraw
+        im = Image.open("/tmp/icon512.png").convert("RGB")
+        import os
+        for d, px in (("mdpi",48),("hdpi",72),("xhdpi",96),("xxhdpi",144),("xxxhdpi",192)):
+            p = "app/src/main/res/mipmap-" + d
+            os.makedirs(p, exist_ok=True)
+            sq = im.resize((px, px), Image.LANCZOS)
+            sq.save(p + "/ic_launcher.png")
+            m = Image.new("L", (px*4, px*4), 0)
+            ImageDraw.Draw(m).ellipse((0, 0, px*4-1, px*4-1), fill=255)
+            m = m.resize((px, px), Image.LANCZOS)
+            r = sq.convert("RGBA"); r.putalpha(m)
+            r.save(p + "/ic_launcher_round.png")
+        print("Icons OK")
+        PY
+        grep -rl 'name="app_name"' app/src/main/res | xargs sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Namaz Tracker</string>#'
+        echo "App name set"
 
     - name: Fix Manifest
       run: |
@@ -37,6 +54,8 @@ jobs:
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
             <application
                 android:allowBackup="true"
+                android:icon="@mipmap/ic_launcher"
+                android:roundIcon="@mipmap/ic_launcher_round"
                 android:label="@string/app_name"
                 android:supportsRtl="true"
                 android:theme="@style/Theme.NamazTracker"
