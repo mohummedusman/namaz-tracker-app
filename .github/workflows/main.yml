@@ -209,6 +209,8 @@ jobs:
         }
 
         @Override public void onBackPressed()"""),
+            ("swipe.setOnRefreshListener(() -> webView.reload());",
+             "swipe.setEnabled(false);"),
             ("injectUserData();",
              "injectUserData();\n                deliverToken();"),
             ("String url = req.getUrl().toString();",
